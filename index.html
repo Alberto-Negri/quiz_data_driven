@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quiz LIVE – Organizzazione, AI e Data-Driven (100 domande)</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f6f8; padding:20px; }
+    .container { max-width:900px; margin:auto; background:#fff; padding:25px; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.1); }
+    h1 { text-align:center; }
+    .top { display:flex; justify-content:space-between; margin-bottom:10px; }
+    .question { font-size:20px; margin:20px 0; }
+    .answers button { display:block; width:100%; margin:10px 0; padding:12px; font-size:16px; cursor:pointer; border-radius:6px; border:1px solid #ccc; background:#fafafa; }
+    .answers button:hover { background:#eee; }
+    .correct { background:#c8e6c9 !important; }
+    .wrong { background:#ffcdd2 !important; }
+    .disabled { pointer-events:none; }
+    .hidden { display:none; }
+    .score { text-align:center; font-size:22px; margin-top:30px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Quiz LIVE – Organizzazione, AI e Data-Driven</h1>
+  <div class="top">
+    <div id="counter"></div>
+    <div id="points"></div>
+  </div>
+  <div id="quiz">
+    <div class="question" id="question"></div>
+    <div class="answers" id="answers"></div>
+  </div>
+  <div id="final" class="score hidden"></div>
+</div>
+
+<script>
+const questions = [
+  {q:"Secondo Herbert Simon, le organizzazioni servono a:",a:["Ottimizzare sempre le decisioni","Gestire la razionalità limitata","Eliminare l'incertezza","Automatizzare il lavoro"],c:1},
+  {q:"Un'organizzazione è definita come:",a:["Sistema tecnico chiuso","Sistema sociale aperto orientato a obiettivi","Mercato interno","Gerarchia rigida"],c:1},
+  {q:"Chi ha introdotto il concetto di razionalità limitata?",a:["Weber","Simon","Mintzberg","Chandler"],c:1},
+  {q:"L'idea che la tecnologia non sia deterministica implica che:",a:["Produce sempre gli stessi effetti","Dipende dal contesto organizzativo","Sostituisce l'uomo","È neutrale"],c:1},
+  {q:"La cultura organizzativa secondo Schein è:",a:["Insieme di procedure","Pattern di assunti condivisi","Sistema di incentivi","Stile di leadership"],c:1},
+  {q:"Il caso Amazon Recruiting Tool mostra che l'AI:",a:["Elimina i bias","Replica quelli esistenti","È neutrale","Riduce le disuguaglianze"],c:1},
+  {q:"Il caso NHS AI Triage evidenzia che:",a:["Accuratezza garantisce adozione","La cultura influenza l'uso","I medici rifiutano sempre l'AI","I dati clinici sono inutili"],c:1},
+  {q:"Dire che le organizzazioni non sono neutrali significa che:",a:["Sono inefficaci","Influenzano valori e comportamenti","Sono tecniche","Dipendono solo dal mercato"],c:1},
+  {q:"Essere data-driven significa soprattutto:",a:["Avere dashboard","Avere molti KPI","Usare dati per decidere","Automatizzare tutto"],c:2},
+  {q:"Chi decide cosa misurare esercita:",a:["Un ruolo tecnico","Nessun potere","Potere organizzativo","Solo controllo"],c:2},
+
+  {q:"Secondo Zuboff, il behavioural surplus è:",a:["Dati clinici","Dati necessari al servizio","Dati raccolti oltre il servizio","Dati sintetici"],c:2},
+  {q:"L'instrumentarian power si basa su:",a:["Coercizione","Previsione del comportamento","Violenza","Gerarchia"],c:1},
+  {q:"Algorithms as management significa che:",a:["Gli algoritmi sono neutrali","Svolgono funzioni manageriali","Sostituiscono i manager","Sono solo IT"],c:1},
+  {q:"Un rischio chiave dell'AI nel lavoro è:",a:["Aumento autonomia","Bias","Trasparenza","Empowerment"],c:1},
+  {q:"La AI J-curve indica:",a:["Benefici immediati","Ritardo nei benefici macro","Fallimento AI","Crescita lineare"],c:1},
+
+  {q:"Human-centred AI significa:",a:["Massima automazione","Sostituzione dell'uomo","Complementarità uomo-AI","Riduzione leadership"],c:2},
+  {q:"Quale cluster riguarda privacy e sicurezza?",a:["Trustworthiness","Division of labour","Protection of the individual","Learning"],c:2},
+  {q:"Human-in-the-loop implica che:",a:["L'AI decide","L'umano mantiene controllo","Solo IT supervisiona","È sperimentale"],c:1},
+  {q:"Il ruolo del leader nell'era AI è soprattutto:",a:["Controllore","Programmatore","Coach e sense-maker","Tecnico"],c:2},
+  {q:"Secondo Gallup, quale NON è driver di readiness?",a:["Leadership","Team","HR","Hardware"],c:3},
+
+  {q:"La struttura funzionale favorisce:",a:["Velocità","Specializzazione","Innovazione radicale","Autonomia"],c:1},
+  {q:"La struttura divisionale ha come limite:",a:["Silos","Duplicazioni","Mancanza controllo","Scarsa accountability"],c:1},
+  {q:"La matrix organization è caratterizzata da:",a:["Un solo capo","Dual authority","Autonomia totale","Centralizzazione"],c:1},
+  {q:"Gli ospedali sono tipicamente:",a:["Funzionali","Professional bureaucracies","Platform","Network"],c:1},
+  {q:"Secondo Chandler:",a:["La struttura precede la strategia","La strategia segue la struttura","La struttura segue la strategia","Sono indipendenti"],c:2},
+
+  {q:"La Business Intelligence serve a:",a:["Archiviare dati","Fare report","Supportare decisioni","Ridurre IT"],c:2},
+  {q:"La prescriptive analytics risponde a:",a:["Cosa è successo?","Perché?","Cosa succederà?","Cosa fare?"],c:3},
+  {q:"La differenza tra dato e informazione è:",a:["Formato","Contesto","Quantità","Tecnologia"],c:1},
+  {q:"Una data-informed organization:",a:["Decide solo con dati","Combina dati ed esperienza","Ignora dati","Automatizza tutto"],c:1},
+  {q:"ETL significa che i dati vengono trasformati:",a:["Dopo il load","Prima del load","Mai","Nel front-end"],c:1},
+
+  {q:"Un rischio della data-driven organization è:",a:["KPI overload","Apprendimento","Trasparenza","Accountability"],c:0},
+  {q:"I data silos riducono:",a:["La sicurezza","L'integrazione degli insight","La qualità tecnica","La privacy"],c:1},
+  {q:"Una forte data culture incoraggia:",a:["Silenzio","Domande basate su dati","Intuizione pura","Centralizzazione"],c:1},
+  {q:"Il KPI chasing produce:",a:["Innovazione","Comportamenti opportunistici","Apprendimento","Fiducia"],c:1},
+  {q:"Hybrid intelligence indica:",a:["AI autonoma","Cooperazione uomo-AI","Sostituzione lavoro","Automazione totale"],c:1}
+];
+
+// Randomizzazione
+questions.sort(() => Math.random() - 0.5);
+
+let index = 0;
+let score = 0;
+
+const qEl = document.getElementById('question');
+const aEl = document.getElementById('answers');
+const counter = document.getElementById('counter');
+const points = document.getElementById('points');
+const final = document.getElementById('final');
+
+function load() {
+  if (index >= questions.length) {
+    document.getElementById('quiz').classList.add('hidden');
+    final.classList.remove('hidden');
+    final.innerHTML = `Quiz terminato 🎉<br><br>Punteggio: <strong>${score} / ${questions.length}</strong>`;
+    return;
+  }
+  const q = questions[index];
+  qEl.textContent = q.q;
+  counter.textContent = `Domanda ${index + 1} / ${questions.length}`;
+  points.textContent = `Punti: ${score}`;
+  aEl.innerHTML = "";
+  q.a.forEach((ans, i) => {
+    const b = document.createElement('button');
+    b.textContent = ans;
+    b.onclick = () => select(b, i);
+    aEl.appendChild(b);
+  });
+}
+
+function select(btn, i) {
+  const q = questions[index];
+  const buttons = document.querySelectorAll('.answers button');
+  buttons.forEach((b, j) => {
+    b.classList.add('disabled');
+    if (j === q.c) b.classList.add('correct');
+    if (j === i && j !== q.c) b.classList.add('wrong');
+  });
+  if (i === q.c) score++;
+  setTimeout(() => { index++; load(); }, 900);
+}
+
+load();
+</script>
+</body>
+</html>
